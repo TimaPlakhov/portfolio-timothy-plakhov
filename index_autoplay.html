@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* ── Splash screen ── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 1.2s ease;
+    }
+    #splash.fade {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #splash-btn {
+      width: 64px;
+      height: 64px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    #splash:hover #splash-btn {
+      border-color: rgba(255,255,255,0.9);
+      transform: scale(1.08);
+    }
+    #splash-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: #fff;
+      margin-left: 3px;
+    }
+
+    /* ── Gallery ── */
+    #gallery {
+      width: 100vw;
+      height: 100vh;
+      overflow-y: scroll;
+      scrollbar-width: none;
+      padding-bottom: 64px;
+    }
+    #gallery::-webkit-scrollbar { display: none; }
+
+    .slide {
+      width: 100vw;
+      height: auto;
+      position: relative;
+      background: #000;
+    }
+    .slide img {
+      width: 100%;
+      height: auto;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* ── Bottom music player ── */
+    #player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 24px;
+      z-index: 200;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    #btn-play {
+      width: 38px;
+      height: 38px;
+      border: none;
+      background: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    #btn-play:hover { background: #ddd; transform: scale(1.08); }
+    #btn-play svg { width: 14px; height: 14px; fill: #000; margin-left: 2px; }
+
+    #progress-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    #track-name {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #seek {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.18);
+      cursor: pointer;
+      outline: none;
+    }
+    #seek::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px; height: 10px;
+      border-radius: 50%; background: #fff; cursor: pointer;
+    }
+    #seek::-moz-range-thumb {
+      width: 10px; height: 10px;
+      border-radius: 50%; background: #fff; border: none; cursor: pointer;
+    }
+    #time {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+    #vol-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    #vol-wrap svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.45); }
+    #volume {
+      width: 72px;
+      appearance: none; -webkit-appearance: none;
+      height: 3px; border-radius: 2px;
+      background: rgba(255,255,255,0.18);
+      cursor: pointer; outline: none;
+    }
+    #volume::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px; height: 10px;
+      border-radius: 50%; background: #fff; cursor: pointer;
+    }
+    #volume::-moz-range-thumb {
+      width: 10px; height: 10px;
+      border-radius: 50%; background: #fff; border: none; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Splash: клік запускає музику і відкриває сайт -->
+<div id="splash">
+  <div id="splash-btn">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  </div>
+</div>
+
+<!-- Gallery -->
+<div id="gallery">
+  <!--
+    Заміни на свої зображення у папці images/
+    Формат: <div class="slide"><img src="images/1.webp" alt="" /></div>
+  -->
+  <div class="slide"><img src="images/1.webp" alt="" /></div>
+  <div class="slide"><img src="images/2.webp" alt="" /></div>
+  <div class="slide"><img src="images/3.webp" alt="" /></div>
+  <div class="slide"><img src="images/4.webp" alt="" /></div>
+  <div class="slide"><img src="images/5.webp" alt="" /></div>
+<div class="slide"><img src="images/6.webp" alt="" /></div>
+<div class="slide"><img src="images/7.webp" alt="" /></div>
+<div class="slide"><img src="images/8.webp" alt="" /></div>
+<div class="slide"><img src="images/9.webp" alt="" /></div>
+<div class="slide"><img src="images/10.webp" alt="" /></div>
+<div class="slide"><img src="images/11.webp" alt="" /></div>
+<div class="slide"><img src="images/12.webp" alt="" /></div>
+</div>
+
+<!-- Трек у папці music/ -->
+<audio id="audio" loop>
+  <source src="music/track.mp3" type="audio/mpeg" />
+</audio>
+
+<!-- Player -->
+<div id="player">
+  <button id="btn-play" title="Play / Pause">
+    <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  </button>
+  <div id="progress-wrap">
+    <div id="track-name">track</div>
+    <input id="seek" type="range" min="0" max="100" value="0" step="0.1" />
+  </div>
+  <div id="time">0:00 / 0:00</div>
+  <div id="vol-wrap">
+    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5" />
+  </div>
+</div>
+
+<script>
+  const audio   = document.getElementById('audio');
+  const btnPlay = document.getElementById('btn-play');
+  const iconSvg = document.getElementById('icon-play');
+  const seek    = document.getElementById('seek');
+  const timeEl  = document.getElementById('time');
+  const volEl   = document.getElementById('volume');
+  const splash  = document.getElementById('splash');
+
+  const PLAY_PATH  = 'M8 5v14l11-7z';
+  const PAUSE_PATH = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+
+  function setIcon(playing) {
+    iconSvg.querySelector('path').setAttribute('d', playing ? PAUSE_PATH : PLAY_PATH);
+    iconSvg.style.marginLeft = playing ? '0' : '2px';
+  }
+
+  audio.volume = 0.5;
+
+  // ── Splash click: запускає музику і зникає ──
+  splash.addEventListener('click', () => {
+    audio.play().then(() => {
+      setIcon(true);
+    }).catch(() => {
+      setIcon(false);
+    });
+    splash.classList.add('fade');
+    setTimeout(() => splash.remove(), 1200);
+  });
+
+  // ── Play / Pause ──
+  btnPlay.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play();
+      setIcon(true);
+    } else {
+      audio.pause();
+      setIcon(false);
+    }
+  });
+
+  // ── Seek ──
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    seek.value = pct;
+    seek.style.background =
+      `linear-gradient(to right, #fff ${pct}%, rgba(255,255,255,0.18) ${pct}%)`;
+    timeEl.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
+  });
+
+  seek.addEventListener('input', () => {
+    if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration;
+  });
+
+  // ── Volume ──
+  volEl.addEventListener('input', () => {
+    audio.volume = volEl.value;
+    updateVolFill();
+  });
+  function updateVolFill() {
+    const v = volEl.value * 100;
+    volEl.style.background =
+      `linear-gradient(to right, #fff ${v}%, rgba(255,255,255,0.18) ${v}%)`;
+  }
+  updateVolFill();
+
+  // ── Time format ──
+  function fmt(s) {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  // ── Track name ──
+  const src = audio.querySelector('source')?.src || '';
+  const name = src.split('/').pop().replace(/\.[^.]+$/, '');
+  document.getElementById('track-name').textContent = name || 'track';
+</script>
+
+</body>
+</html>
